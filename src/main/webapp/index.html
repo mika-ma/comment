@@ -1,0 +1,143 @@
+<!doctype html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<html>
+<head>
+    <title>商品详情</title>
+    <script type="text/javascript" src="jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+
+        function cc(id) {
+            //删除评论
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "http://localhost:8080/season/product/delete?id=" + id,
+                data: id,
+                success: function (data) {
+                    location.href = "http://localhost:8080/season/index.html"
+                }
+
+            });
+        }
+
+        function dd(id, comment) {
+            //修改评论
+            $("#comment").val(comment);
+            $("#div1").append("<button id='b_c' >确认修改</button>");
+            $("#a_c").css('display:none');
+            
+            $("#b_c").click(function () {
+            var changeComment = $("#comment").val();
+
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    url:"http://localhost:8080/season/product/update?id="+id,
+                    data: {
+                        comment: changeComment
+                    },
+                    success: function (data) {
+                        location.href = "http://localhost:8080/season/index.html"
+                    }
+
+                })
+            })
+
+        }
+
+
+
+
+        $(document).ready(function() {
+
+        $(function bb () {
+                //查询显示所有评论
+                $.ajax({
+                    type: "get",
+                    dataType: "json",
+                    url: "http://localhost:8080/season/product/findAllComments",
+                    data: null,
+                    success: function (data) {
+                        $("#commentDiv").empty();
+                        var commentsText = "";
+                        $.each(data.comments, function (commentIndex, comment) {
+                            commentsText += "<li>" +
+                                    "<div style='background-color: #d9fff7'>" + "游客" + comment.commentId + "说：</div>" +
+                                    "<div style='background-color: #fff3f3'><b>" +  comment.commentContent + "</b></div>" +
+                                    "<div style='background-color: #fff3f3'>" + "评论时间：" +comment.createDate+
+
+//                                new Date(comment.createDate).getFullYear()+"."+
+//                                new Date(comment.createDate).getUTCMonth()+"."+
+//                                new Date(comment.createDate).getDate()+"&nbsp&nbsp&nbsp&nbsp"+
+//                                new Date(comment.createDate).getHours()+" : "+
+//                                new Date(comment.createDate).getMinutes() +
+
+                                    "&nbsp&nbsp"+"<button id='"+comment.commentId+"' onclick='cc("+comment.commentId+")'>"+"删除"+"</button>"+
+                                    "&nbsp&nbsp"+"<button id='"+comment.commentId+"' onclick='dd("+comment.commentId+","+comment.commentContent+")'>"+"修改"+"</button>"+
+                                    "</div>"+"</li>";
+                        });
+                        $("#commentDiv").append(commentsText);
+                    }
+                });
+            });
+
+            //发表提交评论
+            $("#a_c").click(function aa () {
+
+                var enterComment = $("#comment").val();
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: "http://localhost:8080/season/product/saveComment",
+                    data: {
+                        comment: enterComment
+                    },
+                    success: function (data) {
+                    location.href="http://localhost:8080/season/index.html"
+                    }
+                });
+
+            });
+
+        });
+    </script>
+</head>
+<body>
+
+
+
+
+<p align=center>
+    <font style="font-size:12pt">
+        <span> 冰箱 </span>
+    </font>
+    <br><br>
+
+    <FONT style="font-size:9pt" color=darkgray>
+        来源：<TRS_DOCUMENT FIELD="DOCSOURCE" AUTOLINK="TRUE">来源 </TRS_DOCUMENT>
+        时间：<TRS_DATETIME>时间</TRS_DATETIME>
+    </FONT>
+    <br><br>
+
+
+    <img align="center" style="width: 25%; height: 50%" src='./bx.png' border=0/>
+    <br><br>
+
+    <font style="font-size:15pt">
+        <span> 642升变频风冷对开门冰箱；优雅香槟金，时尚百搭；变频压缩机，节能静音；手机操控，智能饮食养生，低温净味系统 </span>
+    </font>
+    <br><br>
+
+</p>
+<br><br>
+ 
+<div id="div1"> 
+请发表您的评论：<br>
+<textarea type="text" id="comment" cols="80" rows="2"></textarea>
+<input type="button" id="a_c" value="发表"/>
+</div>
+
+<div id="commentDiv"></div>
+
+</body>
+</html>
